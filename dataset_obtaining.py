@@ -4,7 +4,7 @@ from typing import Dict
 import tushare as ts
 import pandas as pd
 
-ts.set_token('da90991b4f0659b48d202e536f7e400b946027197b8276e82ae48971')
+ts.set_token('')
 pro = ts.pro_api()
 
 
