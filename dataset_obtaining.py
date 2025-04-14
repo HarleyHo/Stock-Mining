@@ -1,10 +1,10 @@
 import time
 from typing import Dict
-
+import os
 import tushare as ts
 import pandas as pd
 
-ts.set_token('')
+ts.set_token(os.environ['TS_TOKEN'])
 pro = ts.pro_api()
 
 
