@@ -3,84 +3,108 @@ from typing import Dict
 import os
 import tushare as ts
 import pandas as pd
+from utils import setup_logger
 
+logger = setup_logger()
+
+# Set Tushare token and initialize pro API
 ts.set_token(os.environ['TS_TOKEN'])
 pro = ts.pro_api()
 
+# Directory to store stock data
+OUTPUT_DIR = "stock_data"
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
+
 
 def get_hsi(api=pro):
+    """
+    Retrieve HSI index data if not already present.
+    Returns: HSI DataFrame
+    """
+    hsi_file = 'HSI.csv'
+    if os.path.exists(hsi_file):
+        return pd.read_csv(hsi_file)
+
     hsi = api.index_global(ts_code='HSI', start_date='20150412', end_date='20250412')
     hsi['trade_date'] = pd.to_datetime(hsi['trade_date'], format='%Y%m%d')
     hsi.sort_values('trade_date', inplace=True)
-    hsi.to_csv('HSI.csv', index=False)
-    return hsi
+    hsi.to_csv(hsi_file, index=False)
 
 
 def get_open_date(api=pro):
-    dates = api.hk_tradecal(start_date='20250112', end_date='20250116', is_open='1')
-    dates = dates[['cal_date']].sort_values('cal_date')
-    return dates['cal_date'].tolist()
+    """
+    Fetch open trading dates.
+    Returns: List of trading dates
+    """
+    dates = api.hk_tradecal(start_date='20241112', end_date='20250412', is_open='1')
+    return dates[['cal_date']].sort_values('cal_date')['cal_date'].tolist()
 
 
 def get_daily(trade_date, api=pro):
+    """
+    Retrieve daily trading data with retry logic.
+    Args:
+        trade_date: Date to fetch data for
+        api: Tushare API instance
+    Returns: Daily data DataFrame
+    """
     for _ in range(3):
         try:
-            df = api.hk_daily(trade_date=trade_date)
-            return df
-        except Exception as e:
-            print(f"API access frequency limit exceeded: {e}")
+            stock = api.hk_daily(trade_date=trade_date)
+            logger.info(f"Daily data of {trade_date} obtain successfully.")
+            return stock
+        except Exception:
             time.sleep(1)
-    return pd.DataFrame()  # Return empty DataFrame if all attempts fail
+    return pd.DataFrame()
 
 
 def get_hkex(api=pro):
+    """
+    Retrieve HKEX basic info if not already present.
+    Returns: HKEX DataFrame
+    """
+    hkex_file = 'HKEX.csv'
+    if os.path.exists(hkex_file):
+        return pd.read_csv(hkex_file)
+
     hkex = api.hk_basic()
-    hkex.to_csv('HKEX.csv', index=False)
+    hkex.to_csv(hkex_file, index=False)
     return hkex
 
 
 def get_ts(trade_dates, ts_codes, api=pro) -> Dict[str, pd.DataFrame]:
-    # Initialize dictionary with empty DataFrames for each stock code
+    """
+    Fetch trading data for specified stocks and dates.
+    Args:
+        trade_dates: List of trading dates
+        ts_codes: List of stock codes
+        api: Tushare API instance
+    Returns: Dictionary mapping stock codes to their DataFrames
+    """
     ts_data: Dict[str, pd.DataFrame] = {ts_code: pd.DataFrame() for ts_code in ts_codes}
 
-    # Iterate through each trading date
     for trade_date in trade_dates:
         df = get_daily(trade_date, api)
         if df.empty:
-            print(f"No data retrieved for date {trade_date}")
             continue
 
-        # For each stock in the daily data, append to its DataFrame
         for ts_code in ts_codes:
-            # Filter rows for current ts_code
             stock_data = df[df['ts_code'] == ts_code]
             if not stock_data.empty:
-                # Append to existing DataFrame
                 ts_data[ts_code] = pd.concat([ts_data[ts_code], stock_data], ignore_index=True)
-
-        print(f"Processed data for date {trade_date}")
 
     return ts_data
 
 
-# Main execution
-if __name__ == "__main__":
-    # Get HSI data
-    get_hsi()
+# Execute data retrieval
+get_hsi()
+hkex = get_hkex()
+dates = get_open_date()
+ts_codes = hkex['ts_code'].tolist()
+stock_data = get_ts(dates, ts_codes)
 
-    # Get HKEX basic info
-    hkex = get_hkex()
-
-    # Get trading dates
-    dates = get_open_date()
-
-    # Get stock codes
-    ts_codes = hkex['ts_code'].tolist()
-
-    # Get trading data
-    stock_data = get_ts(dates, ts_codes)
-
-    # Optional: Save each stock's DataFrame to CSV
-    for ts_code, df in stock_data.items():
-        if not df.empty:
-            df.to_csv(f'stock_{ts_code}.csv', index=False)
+# Save stock data to individual CSV files in output directory
+for ts_code, df in stock_data.items():
+    if not df.empty:
+        df.to_csv(os.path.join(OUTPUT_DIR, f'{ts_code}.csv'), index=False)
