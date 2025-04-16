@@ -142,6 +142,7 @@ def plot_dendrogram(X: np.ndarray, max_clusters: int = MAX_CLUSTERS) -> int:
 
     plt.axhline(y=distances[-optimal_k], color='r', linestyle='--',
                 label=f'Optimal k={optimal_k}')
+    plt.legend()
     plt.savefig(os.path.join(OUTPUT_DIR, 'dendrogram.png'), dpi=FIGURE_DPI, bbox_inches='tight')
     plt.close()
 
