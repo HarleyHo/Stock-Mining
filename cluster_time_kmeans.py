@@ -31,27 +31,27 @@ df['pct_chg'] = df['pct_chg'].apply(a)
 
 
 # ;ast.literal_eval(x)
-# # 展开所有列表到一个大的数组中
+# # Expand all lists into a single large array
 # all_pct_chg_values = np.concatenate(df['pct_chg'].values)
 
-# # 计算整体数据的均值和标准差
+# # Calculate the mean and standard deviation of the entire data
 # mean = np.mean(all_pct_chg_values)
 # std = np.std(all_pct_chg_values)
 
-# # 对所有列表进行标准化 (z-score normalization)
+# # Standardize all lists (z-score normalization)
 # def standardize_list(lst):
 #     return [(x - mean) / std for x in lst]
 
 # df['pct_chg'] = df['pct_chg'].apply(standardize_list)
 # print(df['pct_chg'])
-# 展开所有列表到一个大的数组中
+# Expand all lists into a single large array
 # all_pct_chg_values = np.concatenate(df['pct_chg'].values)
 
-# # 计算整体数据的最小值和最大值
+# # Calculate the minimum and maximum values of the entire data
 # min_val = np.min(all_pct_chg_values)
 # max_val = np.max(all_pct_chg_values)
 
-# # 对所有列表进行归一化 (min-max normalization)
+# # Normalize all lists (min-max normalization)
 # def normalize_list(lst):
 #     return [(x - min_val) / (max_val - min_val) for x in lst]
 
@@ -69,19 +69,19 @@ def calculate_atr(pct_chg_list, window=15):
 
 
 # Function to calculate ADX (Average Directional Index)
-# 计算ADX的平均值
+# Calculate the average value of ADX
 def calculate_adx(pct_chg_list, window=15):
     pct_chg_array = np.array(pct_chg_list)
 
-    # 计算上行和下行的方向性变动
-    up_move = np.maximum(0, np.diff(pct_chg_array))  # 正向变动
-    down_move = np.maximum(0, -np.diff(pct_chg_array))  # 负向变动
+    # Calculate upward and downward directional movements
+    up_move = np.maximum(0, np.diff(pct_chg_array))  # Positive movement
+    down_move = np.maximum(0, -np.diff(pct_chg_array))  # Negative movement
 
-    # 填充 up_move 和 down_move 为与原始数组长度一致（前面部分填充0）
+    # Pad up_move and down_move to match the original array length (fill front with 0)
     up_move = np.pad(up_move, (1, 0), mode='constant', constant_values=0)
     down_move = np.pad(down_move, (1, 0), mode='constant', constant_values=0)
 
-    # 计算平滑的方向性变动
+    # Calculate smoothed directional movements
     plus_di = 100 * (np.convolve(up_move, np.ones(window) / window, mode='valid') / np.convolve(np.abs(pct_chg_array),
                                                                                                 np.ones(
                                                                                                     window) / window,
@@ -91,21 +91,21 @@ def calculate_adx(pct_chg_list, window=15):
                                                                                              np.ones(window) / window,
                                                                                              mode='valid'))
 
-    # 填充 DI 数组使其与原始长度一致
+    # Pad DI arrays to match the original length
     plus_di = np.pad(plus_di, (window - 1, 0), mode='constant', constant_values=0)
     minus_di = np.pad(minus_di, (window - 1, 0), mode='constant', constant_values=0)
 
-    # 计算ADX
-    adx = np.abs(plus_di - minus_di)  # 计算+DI和-DI的差异
-    adx = np.convolve(adx, np.ones(window) / window, mode='valid')  # 对ADX进行移动平均
-    adx = np.pad(adx, (window - 1, 0), mode='constant', constant_values=0)  # 填充ADX结果为与原始数组一致
+    # Calculate ADX
+    adx = np.abs(plus_di - minus_di)  # Calculate the difference between +DI and -DI
+    adx = np.convolve(adx, np.ones(window) / window, mode='valid')  # Moving average of ADX
+    adx = np.pad(adx, (window - 1, 0), mode='constant', constant_values=0)  # Pad ADX result to match the original array
 
-    return np.mean(adx)  # 返回ADX的平均值
+    return np.mean(adx)  # Return the average value of ADX
 
 
 def calculate_ema(pct_chg_list, span=15):
     pct_chg_array = np.array(pct_chg_list)
-    # 使用pandas的ewm函数计算EMA
+    # Calculate EMA using pandas ewm function
     ema = pd.Series(pct_chg_array).ewm(span=span, adjust=False).mean()
     return ema.mean()
 
@@ -143,38 +143,38 @@ df_with_features = pd.concat([df, feature_columns], axis=1)
 # features = ['day_of_year', 'open', 'close', 'high', 'low', 'swing', 'vol']
 features = ['mean', 'std_dev', 'max', 'min', 'median', 'skewness', 'kurtosis', 'adx', 'atr', 'ema']
 res = [{"rate": 0, "list": []} for i in features]
-# 2. 生成所有长度的排列组合
+# 2. Generate all possible combinations of feature lengths
 features = ['std_dev', 'min', 'kurtosis', 'atr']
 X = df_with_features[features]
 
-# 3. 数据标准化
+# 3. Data standardization
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
-# 4. 使用肘部法则选择最优的k值
+# 4. Use the elbow method to select the optimal k value
 inertia = []
 start = 2
 limit = 20
-for k in range(start, limit):  # 可以试试从1到10的聚类数
+for k in range(start, limit):  # Try cluster numbers from 1 to 10
     kmeans = KMeans(n_clusters=k, random_state=42)
     kmeans.fit(X_scaled)
     inertia.append(kmeans.inertia_)
 inertia_diff = np.diff(inertia)
 # print(inertia_diff)
-# 计算变化速率的二阶差分（加速变化）
+# Calculate the second-order difference of the rate of change (acceleration of change)
 inertia_diff2 = np.diff(inertia_diff)
 # print(inertia_diff2)
-# 寻找二阶差分的最小值（即肘部位置）
-k_optimal = np.argmax(inertia_diff2) + 2 + start - 1  # 加2因为我们用了二阶差分
+# Find the minimum value of the second-order difference (i.e., the elbow position)
+k_optimal = np.argmax(inertia_diff2) + 2 + start - 1  # Add 2 because we used second-order difference
 
 print(f"Optimal K based on Elbow method: {k_optimal}")
-# 绘制肘部法则图
+# Plot the elbow method graph
 plt.plot(range(start, limit), inertia, marker='o')
 plt.title('Elbow Method for Optimal k')
 plt.xlabel('Number of clusters (k)')
 plt.ylabel('Inertia')
 plt.show()
 
-# 根据肘部法则选择合适的k值（假设选择k=3）
+# Select the appropriate k value based on the elbow method (assuming k=3)
 kmeans = KMeans(n_clusters=k_optimal, random_state=42)
 df_with_features['cluster'] = kmeans.fit_predict(X_scaled)
 
@@ -189,12 +189,12 @@ plt.ylabel('Principal Component 2')
 plt.colorbar(label='Cluster')
 plt.show()
 
-# 6. 输出每个样本所属的聚类标签
+# 6. Output the cluster labels for each sample
 # print(df[['ts_code', 'trade_date', 'cluster']].head())
 from sklearn.metrics import silhouette_score
 
 print(df_with_features)
-# 计算轮廓系数
+# Calculate the silhouette score
 silhouette_avg = silhouette_score(X_scaled, df_with_features['cluster'])
 print(silhouette_avg)
 
@@ -229,4 +229,3 @@ plt.legend(title='Cluster')
 # Show plot
 plt.tight_layout()
 plt.show()
-

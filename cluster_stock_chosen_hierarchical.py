@@ -301,7 +301,7 @@ selected_stocks = cluster_stocks()
 hkex = pd.read_csv(HKEX_FILE)
 names = []
 for i, row in selected_stocks.iterrows():
-    name = hkex[hkex['ts_code'] == row['ts_code']]['name'].iloc[0]
+    name = hkex[hkex['ts_code'] == row['ts_code']]['enname'].iloc[0]
     names.append(name)
 selected_stocks['name'] = names
 selected_stocks.to_csv(os.path.join(OUTPUT_DIR, 'selected_stocks.csv'), index=False)
