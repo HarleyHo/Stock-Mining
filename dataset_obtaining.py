@@ -30,6 +30,7 @@ def get_hsi(api=pro):
     hsi['trade_date'] = pd.to_datetime(hsi['trade_date'], format='%Y%m%d')
     hsi.sort_values('trade_date', inplace=True)
     hsi.to_csv(hsi_file, index=False)
+    return None
 
 
 def get_open_date(api=pro):
