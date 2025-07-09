@@ -25,7 +25,7 @@ We use Apriori algorithm to find some association rules between the features and
 This can help us find some important features that affect the performance of the index, which can help us to make a better choice when we need to use some features to predict the index.
 
 ### Decision Tree
-Decision Tree is used to offer an easier and more effective way to predict the increase / decrease of the HSI.
+Decision tree is used to offer an easier and more effective way to predict the increase / decrease of the HSI.
 Although the accuracy may not be very high compared to methods like time series or Long Short Term Memory (LSTM), it is still useful given that it is a simple and effective way to predict the index.
 
 By the way, now we are trying to use LSTM to predict the index, as we want to gain a reliable method to predict the index :yum:.
