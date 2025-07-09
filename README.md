@@ -10,11 +10,28 @@ We obtain the data of HSI from 12/04/2015 to 12/04/2025, and the data of Hong Ko
 The obtained data is well processed, and we only need to extract some features we need from the data.
 
 ## Methods
+We use some data mining techniques to find some interesting patterns in the data.
+### Clustering
+We use K-means and hierarchical clustering to cluster the data into some clusters.
+
+For HSI, we try to analyse the relationship between the time and the index fluctuation, rather than use time series or Long Short Term Memory (LSTM) to predict the index,
+we use an easier way, K-means, to find some patterns.
+By the way, now we are trying to use LSTM to predict the index, as we want to gain a reliable method to predict the index :yum:.
+
+For those stocks, we use hierarchical clustering to find some patterns, trying to use an easy way to find some stocks performing similarly.
+Different people may have different opinions on what is a good stock, or they have different ability of bearing risk, then they may choose a set of stocks that matches them.
+
+### Association Rule
+We use Apriori algorithm to find some association rules between the features and the fluctuation of HSI.
+This can help us find some important features that affect the performance of the index, which can help us to make a better choice when we need to use some features to predict the index.
+
+### Decision Tree
+Decision Tree is used to offer an easier and more intuitive way to predict the increase / decrease of the HSI.
 
 ## Usage
 First you need to install the dependencies with ```pip install -r requirements.txt```.
 
-Then you can run ```python dataset_obtaining.py``` to gain the data.
+Then you can run ```python dataset_obtaining.py``` to obtain the data.
 
 After that, you can run other python codes to get the related results.
 
@@ -28,3 +45,4 @@ The results are shown in the [report](report.pdf).
 - [X] Seaborn
 - [X] Sklearn
 - [X] Scipy
+- [X] Mlxtend
