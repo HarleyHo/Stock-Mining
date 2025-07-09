@@ -87,9 +87,9 @@ def calculate_adx(pct_chg_list, window=15):
                                                                                                     window) / window,
                                                                                                 mode='valid'))
     minus_di = 100 * (
-                np.convolve(down_move, np.ones(window) / window, mode='valid') / np.convolve(np.abs(pct_chg_array),
-                                                                                             np.ones(window) / window,
-                                                                                             mode='valid'))
+            np.convolve(down_move, np.ones(window) / window, mode='valid') / np.convolve(np.abs(pct_chg_array),
+                                                                                         np.ones(window) / window,
+                                                                                         mode='valid'))
 
     # Pad DI arrays to match the original length
     plus_di = np.pad(plus_di, (window - 1, 0), mode='constant', constant_values=0)

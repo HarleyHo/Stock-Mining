@@ -2,6 +2,7 @@
 This project is trying to use some data mining techniques to find some interesting patterns in Hang Seng Index (HSI) and Hong Kong stock market.
 
 This is a course project of CS5483 at City University of Hong Kong.
+
 ## Data
 The data is gathered by [TuShare](https://tushare.pro/). We get the data by their API and save them into csv files.
 
@@ -10,5 +11,20 @@ The obtained data is well processed, and we only need to extract some features w
 
 ## Methods
 
+## Usage
+First you need to install the dependencies with ```pip install -r requirements.txt```.
+
+Then you can run ```python dataset_obtaining.py``` to gain the data.
+
+After that, you can run other python codes to get the related results.
+
 ## Results
 The results are shown in the [report](report.pdf).
+
+## Dependencies
+- [X] Pandas
+- [X] Numpy
+- [X] Matplotlib
+- [X] Seaborn
+- [X] Sklearn
+- [X] Scipy
