@@ -14,9 +14,8 @@ We use some data mining techniques to find some interesting patterns in the data
 ### Clustering
 We use K-means and hierarchical clustering to cluster the data into some clusters.
 
-For HSI, we try to analyse the relationship between the time and the index fluctuation, rather than use time series or Long Short Term Memory (LSTM) to predict the index,
-we use an easier way, K-means, to find some patterns.
-By the way, now we are trying to use LSTM to predict the index, as we want to gain a reliable method to predict the index :yum:.
+For HSI, we try to analyse the relationship between the time and the index fluctuation,
+so we use K-means to find some patterns.
 
 For those stocks, we use hierarchical clustering to find some patterns, trying to use an easy way to find some stocks performing similarly.
 Different people may have different opinions on what is a good stock, or they have different ability of bearing risk, then they may choose a set of stocks that matches them.
@@ -27,7 +26,7 @@ This can help us find some important features that affect the performance of the
 
 ### Decision Tree
 Decision Tree is used to offer an easier and more effective way to predict the increase / decrease of the HSI.
-Although the predict accuracy is not very high compared to methods like LSTM, it is still useful.
+Although the accuracy may not be very high compared to methods like time series or Long Short Term Memory (LSTM), it is still useful given that it is a simple and effective way to predict the index.
 
 ## Usage
 First you need to install the dependencies with ```pip install -r requirements.txt```.
