@@ -42,7 +42,6 @@ The results are shown in the [report](report.pdf).
 
 ## Dependencies
 - [X] Pandas
-- [X] Numpy
 - [X] Matplotlib
 - [X] Seaborn
 - [X] Sklearn
