@@ -12,7 +12,7 @@ The obtained data is well processed, and we only need to extract some features w
 ## Methods
 We use some data mining techniques to find some interesting patterns in the data.
 ### Clustering
-We use K-means and hierarchical clustering to cluster the data into some clusters.
+We use K-means and hierarchical clustering.
 
 For HSI, we try to analyse the relationship between the time and the index fluctuation,
 so we use K-means to find some patterns.
